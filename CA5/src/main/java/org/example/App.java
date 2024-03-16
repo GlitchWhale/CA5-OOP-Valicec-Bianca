@@ -27,6 +27,14 @@ public class App {
             } else {
                 System.out.println("Pet with ID " + petId + " not found");
             }
+
+            int petIdToDelete = 5;
+            boolean isDeleted = app.deletePetById(conn, petIdToDelete);
+            if (isDeleted) {
+                System.out.println("Pet with ID " + petIdToDelete + " deleted successfully");
+            } else {
+                System.out.println("Pet with ID " + petIdToDelete + " not found");
+            }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -111,6 +119,20 @@ INSERT INTO pets (pet_id, price, name, pet_type) VALUES
         }
 
         return pet;
+    }
+
+    public boolean deletePetById(Connection connection, int id){
+        String query = "DELETE FROM pets WHERE pet_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Returns true if rows were deleted, false otherwise
+        } catch (SQLException e) {
+            System.out.println("Error deleting pet: " + e.getMessage());
+            return false;
+        }
     }
 
 }

@@ -51,4 +51,23 @@ public class AppTest {
             fail("Failed to connect to the database: " + e.getMessage());
         }
     }
+
+    @Test
+    public void testDeletePetById() throws SQLException {
+        // Establish a connection to the database
+        try (Connection conn = DriverManager.getConnection(url + dbName, userName, password)) {
+            // Create an instance of App
+            App app = new App();
+
+            // Test case 1: Valid pet ID
+            int validPetId = 1; // Assuming this pet ID exists
+            boolean deleted = app.deletePetById(conn, validPetId);
+            assertTrue(deleted);
+
+            // Test case 2: Invalid pet ID
+            int invalidPetId = 100; // Assuming this pet ID doesn't exist
+            boolean notDeleted = app.deletePetById(conn, invalidPetId);
+            assertFalse(notDeleted);
+        }
+    }
 }
