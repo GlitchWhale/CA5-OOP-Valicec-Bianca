@@ -1,10 +1,6 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +15,18 @@ public class App {
         try (Connection conn =
                      DriverManager.getConnection(url + dbName, userName, password)) {
             System.out.println("Connected to the database");
+
             App app = new App();
+
             app.getAllPets(conn);
+
+            int petId = 3;
+            Pet foundPet = app.getPetById(conn, petId);
+            if (foundPet != null) {
+                System.out.println("Found pet: " + foundPet);
+            } else {
+                System.out.println("Pet with ID " + petId + " not found");
+            }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -80,6 +86,31 @@ INSERT INTO pets (pet_id, price, name, pet_type) VALUES
         } catch (SQLException e) {
             System.out.println("Error fetching pets: " + e.getMessage());
         }
+    }
+
+    public Pet  getPetById(Connection connection, int id) {
+        Pet pet = null;
+        String query = "SELECT * FROM pets WHERE pet_id = ?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int petId = resultSet.getInt("pet_id");
+                    double price = resultSet.getDouble("price");
+                    String name = resultSet.getString("name");
+                    String petType = resultSet.getString("pet_type");
+
+                    // Create the Pet object
+                    pet = new Pet(petId, price, name, petType);
+                    pet.setId(resultSet.getInt("id"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error fetching pet: " + e.getMessage());
+        }
+
+        return pet;
     }
 
 }

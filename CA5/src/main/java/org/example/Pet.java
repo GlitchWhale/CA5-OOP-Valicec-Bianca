@@ -59,7 +59,7 @@ public class Pet {
     // toString() method to represent org.example.Pet object as a String
     @Override
     public String toString() {
-        return "org.example.Pet{" +
+        return "Pet{" +
                 "id=" + id +
                 ", petId=" + petId +
                 ", price=" + price +
