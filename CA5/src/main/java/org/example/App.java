@@ -1,3 +1,5 @@
+package org.example;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -64,7 +66,7 @@ INSERT INTO pets (pet_id, price, name, pet_type) VALUES
                 String name = resultSet.getString("name");
                 String petType = resultSet.getString("pet_type");
 
-                // Create a new Pet object and add it to the list
+                // Create a new org.example.Pet object and add it to the list
                 Pet pet = new Pet(petId, price, name, petType);
                 pet.setId(id);
                 pets.add(pet);

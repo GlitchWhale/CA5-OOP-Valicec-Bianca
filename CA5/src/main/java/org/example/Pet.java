@@ -1,3 +1,5 @@
+package org.example;
+
 public class Pet {
     private int id;
     private int petId;
@@ -54,10 +56,10 @@ public class Pet {
         this.petType = petType;
     }
 
-    // toString() method to represent Pet object as a String
+    // toString() method to represent org.example.Pet object as a String
     @Override
     public String toString() {
-        return "Pet{" +
+        return "org.example.Pet{" +
                 "id=" + id +
                 ", petId=" + petId +
                 ", price=" + price +
