@@ -28,12 +28,22 @@ public class App {
                 System.out.println("Pet with ID " + petId + " not found");
             }
 
-            int petIdToDelete = 5;
-            boolean isDeleted = app.deletePetById(conn, petIdToDelete);
-            if (isDeleted) {
-                System.out.println("Pet with ID " + petIdToDelete + " deleted successfully");
+//            int petIdToDelete = 5;
+//            boolean isDeleted = app.deletePetById(conn, petIdToDelete);
+//            if (isDeleted) {
+//                System.out.println("Pet with ID " + petIdToDelete + " deleted successfully");
+//            } else {
+//                System.out.println("Pet with ID " + petIdToDelete + " not found");
+//            }
+
+            Pet newPet = new Pet(11, 45.99, "Snowball", "Hamster");
+
+            // Insert the new pet into the database
+            Pet insertedPet = app.insertPet(conn, newPet);
+            if (insertedPet != null) {
+                System.out.println("Pet inserted successfully. ID: " + insertedPet.getId());
             } else {
-                System.out.println("Pet with ID " + petIdToDelete + " not found");
+                System.out.println("Failed to insert pet.");
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -133,6 +143,32 @@ INSERT INTO pets (pet_id, price, name, pet_type) VALUES
             System.out.println("Error deleting pet: " + e.getMessage());
             return false;
         }
+    }
+
+    public Pet insertPet(Connection connection, Pet pet) {
+        String query = "INSERT INTO pets (pet_id, price, name, pet_type) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setInt(1, pet.getPetId());
+            preparedStatement.setDouble(2, pet.getPrice());
+            preparedStatement.setString(3, pet.getName());
+            preparedStatement.setString(4, pet.getPetType());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected == 1) {
+                // Retrieve the auto-generated ID
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    int id = generatedKeys.getInt(1);
+                    pet.setId(id);
+                    return pet;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error inserting pet: " + e.getMessage());
+        }
+
+        return null;
     }
 
 }

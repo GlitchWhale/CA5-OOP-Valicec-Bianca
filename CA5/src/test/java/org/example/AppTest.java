@@ -70,4 +70,23 @@ public class AppTest {
             assertFalse(notDeleted);
         }
     }
+
+    @Test
+    public void testInsertPet() throws SQLException {
+        // Establish a connection to the database
+        try (Connection conn = DriverManager.getConnection(url + dbName, userName, password)) {
+            // Create an instance of App
+            App app = new App();
+
+            // Create a new Pet object
+            Pet newPet = new Pet(11, 45.99, "Snowball", "Hamster");
+
+            // Test insertion
+            Pet insertedPet = app.insertPet(conn, newPet);
+
+            // Assert that insertedPet is not null and has a valid ID
+            assertNotNull(insertedPet);
+            assertTrue(insertedPet.getId() > 0); // Assert ID is positive
+        }
+    }
 }
