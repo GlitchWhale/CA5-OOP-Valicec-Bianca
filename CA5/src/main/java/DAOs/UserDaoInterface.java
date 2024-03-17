@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserDaoInterface {
     public List<User> findAllUsers() throws DaoException;
 
-    public User findUserByUsernamePassword(String username, String password) throws DaoException;
+    public User findUserByStudentId(int studentId) throws DaoException;
 
     void deleteUserById(int userId) throws DaoException;
 

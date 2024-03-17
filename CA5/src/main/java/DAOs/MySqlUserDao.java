@@ -75,13 +75,11 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
 
     /**
      * Given a username and password, find the corresponding User
-     * @param first_name
-     * @param student_grade
+     * @param studentId
      * @return User object if found, or null otherwise
      * @throws DaoException
      */
-    @Override
-    public User findUserByUsernamePassword(String first_name, String student_grade) throws DaoException
+    public User findUserByStudentId(int studentId) throws DaoException
     {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -91,24 +89,27 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
         {
             connection = this.getConnection();
 
-            String query = "SELECT * FROM `StudentGrades` WHERE first_name = ? AND grade = ?";
+            String query = "SELECT * FROM `StudentGrades` WHERE student_id = ?";
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, first_name);
-            preparedStatement.setString(2, student_grade);
+            preparedStatement.setInt(1, studentId);
 
             resultSet = preparedStatement.executeQuery();
             if (resultSet.next())
             {
                 int userId = resultSet.getInt("id");
-                int studentId = resultSet.getInt("student_Id");
                 String firstName = resultSet.getString("first_name");
+                String lastName = resultSet.getString("last_name");
+                int courseId = resultSet.getInt("course_id");
+                String courseName = resultSet.getString("course_name");
                 float grade = resultSet.getFloat("grade");
+                String semester = resultSet.getString("semester");
 
-                user = new User(userId, studentId, firstName, grade);
+
+                user=new User(userId, studentId, firstName, lastName, courseId, courseName, grade, semester);
             }
         } catch (SQLException e)
         {
-            throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
+            throw new DaoException("findUserByFirstName() " + e.getMessage());
         } finally
         {
             try
@@ -127,7 +128,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
                 }
             } catch (SQLException e)
             {
-                throw new DaoException("findUserByUsernamePassword() " + e.getMessage());
+                throw new DaoException("findUserByFirstName() " + e.getMessage());
             }
         }
         return user;     // reference to User object, or null value

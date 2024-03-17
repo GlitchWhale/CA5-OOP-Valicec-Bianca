@@ -3,7 +3,6 @@ package Objects;
 
 
 import Comparators.UserGradeComparator;
-import DAOs.MySqlDao;
 import DAOs.MySqlUserDao;
 import DAOs.UserDaoInterface;
 import DTOs.User;
@@ -31,10 +30,9 @@ public class App
             }
 
             // test dao - with username and password that we know are present in the database
-            System.out.println("\nCall: findUserByUsernamePassword()");
-            String first_name = "smith";
-            String student_grade = "password";
-            User user = IUserDao.findUserByUsernamePassword(first_name, student_grade);
+            System.out.println("\nCall: findUserByFirstName()");
+            int studentId = 102;
+            User user = IUserDao.findUserByStudentId(studentId);
 
             if( user != null ) // null returned if userid and password not valid
                 System.out.println("User found: " + user);
@@ -42,13 +40,12 @@ public class App
                 System.out.println("Username with that password not found");
 
             // test dao - with an invalid username (i.e. not in database)
-            first_name = "madmax";
-            student_grade = "thunderdome";
-            user = IUserDao.findUserByUsernamePassword(first_name, student_grade);
+            studentId = 1234;
+            user = IUserDao.findUserByStudentId(studentId);
             if(user != null)
-                System.out.println("Username: " + first_name + " was found: " + user);
+                System.out.println("Username: " + studentId + " was found: " + user);
             else
-                System.out.println("Username: " + first_name + ", password: " + student_grade +" is not valid.");
+                System.out.println("Username: " + studentId + " was not found");
 
             // code to delete a user by ID
             System.out.println("\nDeleting user with ID 123...");
