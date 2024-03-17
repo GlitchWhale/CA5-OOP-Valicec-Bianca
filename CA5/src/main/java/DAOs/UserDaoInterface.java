@@ -10,7 +10,7 @@ public interface UserDaoInterface {
 
     public User findUserByStudentId(int studentId) throws DaoException;
 
-    void deleteUserById(int userId) throws DaoException;
+    boolean deleteUserByStudentId(int studentId) throws DaoException;
 
     public User insertUser(User user) throws DaoException;
 

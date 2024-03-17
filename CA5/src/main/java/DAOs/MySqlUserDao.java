@@ -136,38 +136,19 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
 
     /**
      * Given a user ID, delete the corresponding User
-     * @param userId
+     * @param studentId
      * @return User object if found, or null otherwise
      * @throws DaoException
      */
-    public void deleteUserById(int userId) throws DaoException {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            connection = this.getConnection();
-
-            String query = "DELETE FROM StudentGrades WHERE id = ?";
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, userId);
-
-            int rowsDeleted = preparedStatement.executeUpdate();
-            if (rowsDeleted == 0) {
-                throw new DaoException("No user found with ID " + userId + " to delete.");
-            }
+    public boolean deleteUserByStudentId(int studentId) throws DaoException {
+        String sql = "DELETE FROM StudentGrades WHERE student_id = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, studentId);
+            int rowsAffected = preparedStatement.executeUpdate();
+            return rowsAffected > 0; // Return true if at least one row was affected (user deleted)
         } catch (SQLException e) {
-            throw new DaoException("deleteUserById() " + e.getMessage());
-        } finally {
-            try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-                if (connection != null) {
-                    freeConnection(connection);
-                }
-            } catch (SQLException e) {
-                throw new DaoException("deleteUserById() " + e.getMessage());
-            }
+            throw new DaoException("Error deleting user by student ID: " + e.getMessage());
         }
     }
 
