@@ -1,6 +1,6 @@
 package org.example;
 
-import org.example.App;
+import Objects.App;
 import org.junit.jupiter.api.Test;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,7 +20,7 @@ public class AppTest {
         try (Connection conn = DriverManager.getConnection(url + dbName, userName, password)) {
             System.out.println("Connected to the database");
 
-            // Create an instance of org.example.App
+            // Create an instance of Objects.App
             App app = new App();
 
             // Call getAllPets method
