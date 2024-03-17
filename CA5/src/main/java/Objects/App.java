@@ -2,6 +2,7 @@ package Objects;
 
 
 
+import Comparators.UserGradeComparator;
 import DAOs.MySqlDao;
 import DAOs.MySqlUserDao;
 import DAOs.UserDaoInterface;
@@ -78,6 +79,24 @@ public class App
             } catch (DaoException e) {
                 System.out.println("Error: " + e.getMessage());
             }
+
+            // code to find all users using a filter
+            try {
+                UserDaoInterface userDao = new MySqlUserDao();
+                List<User> filteredUsers = userDao.findUsersUsingFilter(new UserGradeComparator());
+
+                // Print header
+                System.out.printf("%-10s %-15s %-15s %-10s %-20s %-10s %-10s%n", "ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester");
+
+                // Print each user
+                for (User filteredUser : filteredUsers) {
+                    System.out.printf("%-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
+                            filteredUser.getId(), filteredUser.getFirstName(), filteredUser.getLastName(),
+                            filteredUser.getCourseId(), filteredUser.getCourseName(), filteredUser.getGrade(), filteredUser.getSemester());
+                }
+            } catch (DaoException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
         catch( DaoException e )
         {
@@ -85,6 +104,5 @@ public class App
         }
 
     }
-
 
 }

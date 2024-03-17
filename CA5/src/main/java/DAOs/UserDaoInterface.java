@@ -3,6 +3,7 @@ package DAOs;
 import DTOs.User;
 import Exceptions.DaoException;
 
+import java.util.Comparator;
 import java.util.List;
 public interface UserDaoInterface {
     public List<User> findAllUsers() throws DaoException;
@@ -15,4 +16,5 @@ public interface UserDaoInterface {
 
    void updateUserByStudentId(int studentId, User user) throws DaoException;
 
+   public List<User> findUsersUsingFilter(Comparator<User> comparator) throws DaoException;
 }

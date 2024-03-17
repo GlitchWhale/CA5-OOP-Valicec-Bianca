@@ -6,6 +6,7 @@ import Exceptions.DaoException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     /**
@@ -228,6 +229,12 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
         return user;
     }
 
+    /**
+     * Given a student ID and a User object, update the corresponding User in the database
+     * @param studentId
+     * @param user
+     * @throws DaoException
+     */
     public void updateUserByStudentId(int studentId, User user) throws DaoException {
         Connection connection = null;
         PreparedStatement preparedStatement = null;
@@ -264,6 +271,62 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
                 throw new DaoException("updateUserByStudentId() " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Given a Comparator, return a List of all users in User database table, sorted using the Comparator
+     * @param comparator
+     * @return List of User objects
+     * @throws DaoException
+     */
+    public List<User> findUsersUsingFilter(Comparator<User> comparator) throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        List<User> filteredUsers = new ArrayList<>();
+
+        try {
+            connection = this.getConnection();
+
+            String query = "SELECT * FROM StudentGrades";
+            preparedStatement = connection.prepareStatement(query);
+
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int userId = resultSet.getInt("id");
+                int studentId = resultSet.getInt("student_id");
+                String firstName = resultSet.getString("first_name");
+                String lastName = resultSet.getString("last_name");
+                int courseId = resultSet.getInt("course_id");
+                String courseName = resultSet.getString("course_name");
+                float grade = resultSet.getFloat("grade");
+                String semester = resultSet.getString("semester");
+                User user = new User(userId, studentId, firstName, lastName, courseId, courseName, grade, semester);
+                filteredUsers.add(user);
+            }
+
+            // Apply the filter
+            filteredUsers.sort(comparator);
+
+        } catch (SQLException e) {
+            throw new DaoException("findUsersUsingFilter() " + e.getMessage());
+        } finally {
+            try {
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("findUsersUsingFilter() " + e.getMessage());
+            }
+        }
+
+        return filteredUsers;
     }
 
 }
