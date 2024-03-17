@@ -102,4 +102,24 @@ public class MySqlUserDaoTest {
         // If the user didn't exist, the user count should remain unchanged
         assertEquals("User count should remain unchanged if user does not exist", initialUserCount, finalUserCount);
     }
+
+    @Test
+    public void testInsertUser_Success() throws DaoException {
+        // Arrange: Prepare test data and dependencies
+        UserDaoInterface userDao = new MySqlUserDao(); // Instantiate your UserDao implementation
+        User userToInsert = new User(111, "Amy", "O'Neill", 304, "Math", 95.5f, "Semester 1"); // Create a user to insert into the database
+        int initialUserCount = userDao.findAllUsers().size(); // Get the initial number of users
+
+        // Act: Call the method to be tested
+        userDao.insertUser(userToInsert);
+
+        // Assert: Verify the effects of insertion
+        int finalUserCount = userDao.findAllUsers().size(); // Get the final number of users after insertion
+
+        // If insertion is successful, the final user count should be greater than the initial user count
+        assertTrue("User should be inserted successfully", finalUserCount > initialUserCount);
+
+        // Clean up: Remove the inserted user from the database
+        userDao.deleteUserByStudentId(userToInsert.getStudentId());
+    }
 }
