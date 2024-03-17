@@ -44,6 +44,16 @@ public User(int studentId, String firstName, String lastName, int courseId, Stri
         this.semester = semester;
     }
 
+    public User(String firstName, String lastName, int courseId, String courseName, float grade, String semester) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.grade = grade;
+        this.semester = semester;
+    }
+
+
     public int getId()
     {
 

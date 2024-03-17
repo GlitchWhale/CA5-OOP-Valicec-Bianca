@@ -58,11 +58,23 @@ public class App
                 System.out.println("Error deleting user: " + deleteException.getMessage());
             }
 
+            // code to insert a new user
             try {
                 UserDaoInterface userDao = new MySqlUserDao();
                 User newUser = new User(110, "John", "Doe", 304, "Math", 95.5f, "Semester 1");
                 User insertedUser = userDao.insertUser(newUser);
                 System.out.println("User inserted successfully. ID: " + insertedUser.getId());
+            } catch (DaoException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+
+            // code to update a user by ID
+            try {
+                UserDaoInterface userDao = new MySqlUserDao();
+                int studentIdToUpdate = 110;
+                User updatedUser = new User("John", "Doe", 304, "Physics", 90.0f, "Semester 2");
+                userDao.updateUserByStudentId(studentIdToUpdate, updatedUser);
+                System.out.println("User updated successfully.");
             } catch (DaoException e) {
                 System.out.println("Error: " + e.getMessage());
             }

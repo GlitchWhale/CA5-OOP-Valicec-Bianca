@@ -12,4 +12,7 @@ public interface UserDaoInterface {
     void deleteUserById(int userId) throws DaoException;
 
     public User insertUser(User user) throws DaoException;
+
+   void updateUserByStudentId(int studentId, User user) throws DaoException;
+
 }

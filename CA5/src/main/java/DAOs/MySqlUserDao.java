@@ -228,6 +228,42 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
         return user;
     }
 
+    public void updateUserByStudentId(int studentId, User user) throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
 
+        try {
+            connection = this.getConnection();
+
+            String query = "UPDATE StudentGrades SET first_name = ?, last_name = ?, course_id = ?, " +
+                    "course_name = ?, grade = ?, semester = ? WHERE student_id = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, user.getFirstName());
+            preparedStatement.setString(2, user.getLastName());
+            preparedStatement.setInt(3, user.getCourseId());
+            preparedStatement.setString(4, user.getCourseName());
+            preparedStatement.setFloat(5, user.getGrade());
+            preparedStatement.setString(6, user.getSemester());
+            preparedStatement.setInt(7, studentId);
+
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated == 0) {
+                throw new DaoException("No user found with student ID " + studentId + " to update.");
+            }
+        } catch (SQLException e) {
+            throw new DaoException("updateUserByStudentId() " + e.getMessage());
+        } finally {
+            try {
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("updateUserByStudentId() " + e.getMessage());
+            }
+        }
+    }
 
 }
