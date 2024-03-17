@@ -4,6 +4,7 @@ import Exceptions.DaoException;
 import org.junit.Test;
 import org.junit.After;
 import org.junit.Before;
+import Comparators.UserGradeComparator;
 
 import java.util.List;
 
@@ -147,5 +148,38 @@ public class MySqlUserDaoTest {
 
         // Clean up: Remove the inserted user from the database
         userDao.deleteUserByStudentId(userToUpdate.getStudentId());
+    }
+
+    @Test
+    public void testFindUsersUsingFilter_GradeComparator() throws DaoException {
+        // Arrange: Prepare test data and dependencies
+        UserDaoInterface userDao = new MySqlUserDao(); // Instantiate your UserDao implementation
+        List<User> initialUsers = userDao.findAllUsers(); // Get the initial list of users
+
+        // Act: Call the method to be tested
+        List<User> usersFilteredByGrade = userDao.findUsersUsingFilter(new UserGradeComparator());
+
+        // Print the contents of both lists for debugging
+        System.out.println("Initial Users:");
+        for (User user : initialUsers) {
+            System.out.println(user);
+        }
+        System.out.println("Filtered Users:");
+        for (User user : usersFilteredByGrade) {
+            System.out.println(user);
+        }
+
+        // Assert: Verify the results
+        assertNotNull("Filtered user list should not be null", usersFilteredByGrade);
+
+        // Verify that the filtered list is a subset of the initial user list
+        assertTrue("Filtered user list should be a subset of initial user list", initialUsers.containsAll(usersFilteredByGrade));
+
+        // Verify that the filtered list is sorted by grade in descending order
+        float previousGrade = Float.MAX_VALUE;
+        for (User user : usersFilteredByGrade) {
+            assertTrue("User should have grade less than or equal to previous user's grade", user.getGrade() <= previousGrade);
+            previousGrade = user.getGrade();
+        }
     }
 }

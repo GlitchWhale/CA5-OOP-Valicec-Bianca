@@ -1,5 +1,5 @@
 package DTOs;
-
+import java.util.Objects;
 public class User {
     private int id;
 
@@ -147,5 +147,24 @@ public User(int studentId, String firstName, String lastName, int courseId, Stri
                 ", grade=" + grade +
                 ", semester='" + semester + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return studentId == user.studentId &&
+                courseId == user.courseId &&
+                Float.compare(user.grade, grade) == 0 &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(courseName, user.courseName) &&
+                Objects.equals(semester, user.semester);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(studentId, firstName, lastName, courseId, courseName, grade, semester);
     }
 }
