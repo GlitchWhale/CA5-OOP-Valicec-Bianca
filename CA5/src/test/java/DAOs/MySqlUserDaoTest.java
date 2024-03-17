@@ -122,4 +122,30 @@ public class MySqlUserDaoTest {
         // Clean up: Remove the inserted user from the database
         userDao.deleteUserByStudentId(userToInsert.getStudentId());
     }
+
+    @Test
+    public void testUpdateUserByStudentId_Success() throws DaoException {
+        // Arrange: Prepare test data and dependencies
+        UserDaoInterface userDao = new MySqlUserDao(); // Instantiate your UserDao implementation
+        User userToUpdate = new User(123456, "Alice", "Smith", 306, "Biology", 92.0f,"Semester 1"); // Create a user to update in the database
+        userDao.insertUser(userToUpdate); // Insert the user into the database
+        int initialUserCount = userDao.findAllUsers().size(); // Get the initial number of users
+
+        // Act: Call the method to be tested
+        String updatedFirstName = "UpdatedFirstName";
+        userToUpdate.setFirstName(updatedFirstName); // Set the updated first name
+        userDao.updateUserByStudentId(userToUpdate.getStudentId(), userToUpdate);
+
+        // Assert: Verify the effects of the update
+        int finalUserCount = userDao.findAllUsers().size(); // Get the final number of users after update
+        User updatedUser = userDao.findUserByStudentId(userToUpdate.getStudentId()); // Retrieve the updated user
+
+        // Verify that the user count remains unchanged and the first name is updated
+        assertEquals("User count should remain unchanged", initialUserCount, finalUserCount);
+        assertNotNull("Updated user should not be null", updatedUser);
+        assertEquals("First name should be updated", updatedFirstName, updatedUser.getFirstName());
+
+        // Clean up: Remove the inserted user from the database
+        userDao.deleteUserByStudentId(userToUpdate.getStudentId());
+    }
 }
