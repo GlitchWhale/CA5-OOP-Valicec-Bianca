@@ -4,10 +4,7 @@ import DAOs.UserDaoInterface;
 import DTOs.User;
 import Exceptions.DaoException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
@@ -171,6 +168,66 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
             }
         }
     }
+
+    /**
+     * Given a User object, insert a new User into the database
+     * @param user
+     * @return User object with ID field set
+     * @throws DaoException
+     */
+    public User insertUser(User user) throws DaoException {
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet generatedKeys = null;
+
+        try {
+            connection = this.getConnection();
+
+            String query = "INSERT INTO StudentGrades (student_id, first_name, last_name, course_id, course_name, grade, semester) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, user.getStudentId());
+            preparedStatement.setString(2, user.getFirstName());
+            preparedStatement.setString(3, user.getLastName());
+            preparedStatement.setInt(4, user.getCourseId());
+            preparedStatement.setString(5, user.getCourseName());
+            preparedStatement.setFloat(6, user.getGrade());
+            preparedStatement.setString(7, user.getSemester());
+
+            int rowsInserted = preparedStatement.executeUpdate();
+            if (rowsInserted == 0) {
+                throw new DaoException("Failed to insert user into the database.");
+            }
+
+            // Retrieve auto-generated ID
+            generatedKeys = preparedStatement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int userId = generatedKeys.getInt(1);
+                user.setId(userId);
+            } else {
+                throw new DaoException("Failed to retrieve auto-generated ID for the inserted user.");
+            }
+        } catch (SQLException e) {
+            throw new DaoException("insertUser() " + e.getMessage());
+        } finally {
+            try {
+                if (generatedKeys != null) {
+                    generatedKeys.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    freeConnection(connection);
+                }
+            } catch (SQLException e) {
+                throw new DaoException("insertUser() " + e.getMessage());
+            }
+        }
+
+        return user;
+    }
+
 
 
 }

@@ -33,8 +33,15 @@ public class User {
         this.grade = grade;
     }
 
-    public User()
+public User(int studentId, String firstName, String lastName, int courseId, String courseName, float grade, String semester)
     {
+        this.studentId = studentId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.courseId = courseId;
+        this.courseName = courseName;
+        this.grade = grade;
+        this.semester = semester;
     }
 
     public int getId()
@@ -96,6 +103,26 @@ public class User {
     public void setCourseName(String courseName)
     {
         this.courseName = courseName;
+    }
+
+    public float getGrade()
+    {
+        return grade;
+    }
+
+    public void setGrade(float grade)
+    {
+        this.grade = grade;
+    }
+
+    public String getSemester()
+    {
+        return semester;
+    }
+
+    public void setSemester(String semester)
+    {
+        this.semester = semester;
     }
 
     @Override

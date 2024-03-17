@@ -57,6 +57,15 @@ public class App
             } catch (DaoException deleteException) {
                 System.out.println("Error deleting user: " + deleteException.getMessage());
             }
+
+            try {
+                UserDaoInterface userDao = new MySqlUserDao();
+                User newUser = new User(110, "John", "Doe", 304, "Math", 95.5f, "Semester 1");
+                User insertedUser = userDao.insertUser(newUser);
+                System.out.println("User inserted successfully. ID: " + insertedUser.getId());
+            } catch (DaoException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
         }
         catch( DaoException e )
         {

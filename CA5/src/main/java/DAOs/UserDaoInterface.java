@@ -10,4 +10,6 @@ public interface UserDaoInterface {
     public User findUserByUsernamePassword(String username, String password) throws DaoException;
 
     void deleteUserById(int userId) throws DaoException;
+
+    public User insertUser(User user) throws DaoException;
 }
