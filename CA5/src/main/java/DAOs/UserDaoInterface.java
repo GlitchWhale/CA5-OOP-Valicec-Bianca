@@ -20,4 +20,6 @@ public interface UserDaoInterface {
     List<User> findUsersUsingFilter(Comparator<User> comparator) throws DaoException;
 
     String findUserJsonByStudentId(int studentId) throws DaoException;
+
+    String usersListToJson(List<User> list) throws DaoException;
 }

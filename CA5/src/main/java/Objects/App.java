@@ -28,6 +28,7 @@ public class App {
                 System.out.println("4. Insert New User");
                 System.out.println("5. Update User By Student ID");
                 System.out.println("6. Find Users Using Filter");
+                System.out.println("7. Convert List of Users to JSON");
                 System.out.println("8. Convert a single user to JSON");
                 System.out.println("0. Exit");
                 System.out.print("Enter your choice: ");
@@ -55,6 +56,9 @@ public class App {
                         break;
                     case 6:
                         findUsersUsingFilter();
+                        break;
+                    case 7:
+                        convertUsersListToJson();
                         break;
                     case 8:
                         convertUserToJson();
@@ -230,6 +234,20 @@ public class App {
         } catch (InputMismatchException e) {
             System.out.println("Invalid input. Please enter a valid student ID.");
             scanner.nextLine(); // Clear the invalid input from the scanner
+        }
+    }
+
+    private static void convertUsersListToJson() {
+        try {
+            System.out.println("\n--- Converting list of users to JSON ---");
+            // Call DAO method to get list of users
+            List<User> users = IUserDao.findAllUsers();
+            // Convert list of users to JSON
+            String json = IUserDao.usersListToJson(users);
+            // Display JSON
+            System.out.println("JSON representation of users:\n" + json);
+        } catch (DaoException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
