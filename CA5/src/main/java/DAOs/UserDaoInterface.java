@@ -1,3 +1,8 @@
+/**
+ * Main Author: Liam Moore
+ * Other Contributors: Bianca Valicec
+ **/
+
 package DAOs;
 
 import DTOs.User;

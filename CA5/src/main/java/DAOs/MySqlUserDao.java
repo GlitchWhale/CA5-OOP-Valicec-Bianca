@@ -12,6 +12,7 @@ import java.util.List;
 
 public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     /**
+     * Main author: Liam Moore
      * Will access and return a List of all users in User database table
      *
      * @return List of User objects
@@ -67,6 +68,8 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Liam Moore
+     * Other Contributors: Bianca Valicec
      * Given a username and password, find the corresponding User
      *
      * @param studentId
@@ -119,6 +122,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Bianca Valicec
      * Given a user ID, delete the corresponding User
      *
      * @param studentId
@@ -138,6 +142,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Bianca Valicec
      * Given a User object, insert a new User into the database
      *
      * @param user
@@ -198,6 +203,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Bianca Valicec
      * Given a student ID and a User object, update the corresponding User in the database
      *
      * @param studentId
@@ -243,6 +249,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Bianca Valicec
      * Given a Comparator, return a List of all users in User database table, sorted using the Comparator
      *
      * @param comparator
@@ -300,6 +307,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Bianca Valicec
      * Given a student ID, return the corresponding User as a JSON string
      *
      * @param studentId
@@ -321,6 +329,7 @@ public class MySqlUserDao extends MySqlDao implements UserDaoInterface {
     }
 
     /**
+     * Main author: Liam Moore
      * Given a List of User objects, return the List as a JSON string
      *
      * @param list

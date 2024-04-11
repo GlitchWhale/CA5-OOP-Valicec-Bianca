@@ -1,13 +1,14 @@
 package Objects;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
 import Comparators.UserGradeComparator;
 import DAOs.MySqlUserDao;
 import DAOs.UserDaoInterface;
 import DTOs.User;
 import Exceptions.DaoException;
+
+import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Scanner;
 
 public class App {
     private static final Scanner scanner = new Scanner(System.in);
@@ -78,6 +79,9 @@ public class App {
         } while (choice != 0);
     }
 
+    /**
+     * Main Author: Liam Moore
+     **/
     private static void findAllUsers() {
         try {
             System.out.println("\n--- Finding all users ---");
@@ -88,6 +92,10 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Liam Moore
+     * Other Contributors: Bianca Valicec
+     **/
     private static void findUserByStudentId() {
         try {
             System.out.println("\n--- Finding user by student ID ---");
@@ -104,6 +112,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void deleteUserByStudentId() {
         try {
             System.out.println("\n--- Deleting user by student ID ---");
@@ -124,6 +135,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void insertNewUser() {
         try {
             System.out.println("\n--- Inserting new user ---");
@@ -156,6 +170,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void updateUserByStudentId() {
         try {
             System.out.println("\n--- Updating user by student ID ---");
@@ -189,7 +206,9 @@ public class App {
         }
     }
 
-
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void findUsersUsingFilter() {
         try {
             System.out.println("\n--- Finding users using filter ---");
@@ -202,6 +221,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void displayUsers(List<User> users) {
         // Display header
         System.out.printf("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n", "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester");
@@ -211,6 +233,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void displayUser(User user) {
         if (user != null) {
             System.out.printf("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
@@ -221,6 +246,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void convertUserToJson() {
         try {
             System.out.println("\n--- Converting user to JSON ---");
@@ -237,6 +265,9 @@ public class App {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private static void convertUsersListToJson() {
         try {
             System.out.println("\n--- Converting list of users to JSON ---");

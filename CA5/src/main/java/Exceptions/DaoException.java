@@ -1,3 +1,6 @@
+/**
+ * Main Author: Liam Moore
+ **/
 package Exceptions;
 import java.sql.SQLException;
 public class DaoException extends SQLException{

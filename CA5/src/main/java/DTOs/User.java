@@ -1,3 +1,8 @@
+/**
+ * Main Author: Liam Moore
+ * Other Contributors: Bianca Valicec
+ **/
+
 package DTOs;
 import java.util.Objects;
 public class User {

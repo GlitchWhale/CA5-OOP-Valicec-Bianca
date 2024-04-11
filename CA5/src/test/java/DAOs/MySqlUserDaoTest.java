@@ -17,6 +17,9 @@ public class MySqlUserDaoTest {
     private UserDaoInterface userDao;
     private User userToDelete; // Store the user to delete for the test
 
+    /*
+    * Main Author: Bianca Valicec
+    */
     @Before
     public void setUp() throws DaoException {
         // Instantiate your UserDao implementation
@@ -27,6 +30,9 @@ public class MySqlUserDaoTest {
         userDao.insertUser(userToDelete);
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @After
     public void tearDown() throws DaoException {
         // Delete the user inserted during setup
@@ -35,7 +41,9 @@ public class MySqlUserDaoTest {
         }
     }
 
-
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testFindAllUsers() throws DaoException {
         // Act: Call the method to be tested
@@ -45,6 +53,9 @@ public class MySqlUserDaoTest {
         assertFalse("Returned list of users should not be empty", users.isEmpty());
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void findUserByStudentIdTrue() throws DaoException {
         // Act: Call the method to be tested
@@ -54,6 +65,9 @@ public class MySqlUserDaoTest {
         assertEquals("Unexpected studentId", 12345, user.getStudentId());
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void findUserByStudentIdFalse() throws DaoException {
         // Act: Call the method to be tested
@@ -62,6 +76,9 @@ public class MySqlUserDaoTest {
         assertNull("Returned user should be null", user);
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testDeleteUserByStudentId_ExistingUser() throws DaoException {
         // Act: Call the method to be tested
@@ -70,6 +87,9 @@ public class MySqlUserDaoTest {
         assertNull("User should be deleted if it exists", userDao.findUserByStudentId(12345));
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testDeleteUserByStudentId_NonExistingUser() throws DaoException {
         // Act: Call the method to be tested
@@ -78,6 +98,9 @@ public class MySqlUserDaoTest {
         assertNotNull("User count should remain unchanged if user does not exist", userDao.findUserByStudentId(12345));
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testInsertUser_Success() throws DaoException {
         // Act: Call the method to be tested
@@ -87,6 +110,9 @@ public class MySqlUserDaoTest {
         assertNotNull("User should be inserted successfully", userDao.findUserByStudentId(111));
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testUpdateUserByStudentId_Success() throws DaoException {
         // Act: Call the method to be tested
@@ -99,6 +125,9 @@ public class MySqlUserDaoTest {
         assertEquals("First name should be updated", updatedFirstName, userDao.findUserByStudentId(123456).getFirstName());
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testFindUsersUsingFilter_GradeComparator() throws DaoException {
         // Act: Call the method to be tested
@@ -107,6 +136,9 @@ public class MySqlUserDaoTest {
         assertNotNull("Filtered user list should not be null", usersFilteredByGrade);
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testConvertListToJson() throws DaoException {
         // Arrange: Prepare test data
@@ -126,6 +158,9 @@ public class MySqlUserDaoTest {
         assertEquals("Output JSON should match the expected JSON", expectedJson.replaceAll("\\s", ""), json.replaceAll("\\s", ""));
     }
 
+    /*
+     * Main Author: Bianca Valicec
+     */
     @Test
     public void testConvertUserToJson() throws DaoException {
         // Arrange: Prepare test data and dependencies

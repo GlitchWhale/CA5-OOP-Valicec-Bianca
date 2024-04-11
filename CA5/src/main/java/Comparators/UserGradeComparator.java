@@ -1,3 +1,7 @@
+/**
+ * Main Author: Bianca Valicec
+ **/
+
 package Comparators;
 
 import DTOs.User;
