@@ -1,10 +1,10 @@
-package Objects;
+package Client;
 
 import Comparators.UserGradeComparator;
-import DAOs.MySqlUserDao;
-import DAOs.UserDaoInterface;
+import Server.DAOs.MySqlUserDao;
+import Server.DAOs.UserDaoInterface;
 import DTOs.User;
-import Exceptions.DaoException;
+import Server.Exceptions.DaoException;
 
 import java.util.InputMismatchException;
 import java.util.List;

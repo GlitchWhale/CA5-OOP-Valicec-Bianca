@@ -2,7 +2,9 @@ package DAOs;
 
 import Comparators.UserGradeComparator;
 import DTOs.User;
-import Exceptions.DaoException;
+import Server.Exceptions.DaoException;
+import Server.DAOs.MySqlUserDao;
+import Server.DAOs.UserDaoInterface;
 import com.google.gson.Gson;
 import org.junit.After;
 import org.junit.Before;

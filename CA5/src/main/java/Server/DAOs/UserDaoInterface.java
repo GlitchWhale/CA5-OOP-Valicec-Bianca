@@ -3,10 +3,10 @@
  * Other Contributors: Bianca Valicec
  **/
 
-package DAOs;
+package Server.DAOs;
 
 import DTOs.User;
-import Exceptions.DaoException;
+import Server.Exceptions.DaoException;
 
 import java.util.Comparator;
 import java.util.List;
