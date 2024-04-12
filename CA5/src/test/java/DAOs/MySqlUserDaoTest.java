@@ -1,7 +1,7 @@
 package DAOs;
 
-import Comparators.UserGradeComparator;
-import DTOs.User;
+import Server.Comparators.UserGradeComparator;
+import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 import Server.DAOs.MySqlUserDao;
 import Server.DAOs.UserDaoInterface;

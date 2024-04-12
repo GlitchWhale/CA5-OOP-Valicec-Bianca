@@ -1,16 +1,16 @@
-package Client;
+package Server;
 
-import Comparators.UserGradeComparator;
+import Server.Comparators.UserGradeComparator;
 import Server.DAOs.MySqlUserDao;
 import Server.DAOs.UserDaoInterface;
-import DTOs.User;
+import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
-public class App {
+public class App_oldFile {
     private static final Scanner scanner = new Scanner(System.in);
     private static final UserDaoInterface IUserDao = new MySqlUserDao();
 

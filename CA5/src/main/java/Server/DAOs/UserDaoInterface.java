@@ -5,7 +5,7 @@
 
 package Server.DAOs;
 
-import DTOs.User;
+import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 
 import java.util.Comparator;

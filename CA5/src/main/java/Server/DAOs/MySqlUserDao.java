@@ -1,6 +1,6 @@
 package Server.DAOs;
 
-import DTOs.User;
+import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

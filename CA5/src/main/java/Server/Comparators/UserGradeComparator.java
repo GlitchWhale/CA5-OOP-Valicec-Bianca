@@ -2,9 +2,9 @@
  * Main Author: Bianca Valicec
  **/
 
-package Comparators;
+package Server.Comparators;
 
-import DTOs.User;
+import Server.DTOs.User;
 
 import java.util.Comparator;
 
