@@ -83,7 +83,7 @@ public class Server {
 class ClientHandler implements Runnable {
     final int clientNumber;
     static BufferedReader socketReader;
-    PrintWriter socketWriter;
+    static PrintWriter socketWriter;
     Socket clientSocket;
 
     public ClientHandler(Socket clientSocket, int clientNumber) {
@@ -148,7 +148,7 @@ class ClientHandler implements Runnable {
         } catch (IOException ex) {
             System.out.println("Error reading from client: " + ex.getMessage());
         } finally {
-            this.socketWriter.close();
+            socketWriter.close();
             try {
                 socketReader.close();
                 this.clientSocket.close();
@@ -167,7 +167,7 @@ class ClientHandler implements Runnable {
      **/
     private static void displayUsers(List<User> users) {
         // Display header
-        System.out.printf("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n", "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester");
+        socketWriter.printf("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n", "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester");
         // Display each user
         for (User user : users) {
             displayUser(user);
@@ -179,11 +179,11 @@ class ClientHandler implements Runnable {
      **/
     private static void displayUser(User user) {
         if (user != null) {
-            System.out.printf("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
+            socketWriter.printf("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
                     user.getId(), user.getStudentId(), user.getFirstName(), user.getLastName(),
                     user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester());
         } else {
-            System.out.println("User not found.");
+            socketWriter.println("User not found.");
         }
     }
 
@@ -192,11 +192,11 @@ class ClientHandler implements Runnable {
      **/
     private static void findAllUsers() {
         try {
-            System.out.println("\n--- Finding all users ---");
+            socketWriter.println("\n--- Finding all users ---");
             List<User> users = IUserDao.findAllUsers();
             displayUsers(users);
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
+            socketWriter.println("Error: " + e.getMessage());
         }
     }
 
@@ -206,17 +206,17 @@ class ClientHandler implements Runnable {
      **/
     private static void findUserByStudentId() throws IOException {
         try {
-            System.out.println("\n--- Finding user by student ID ---");
-            System.out.print("Enter student ID: ");
+            socketWriter.println("\n--- Finding user by student ID ---");
+            socketWriter.print("Enter student ID: ");
             String studentIdInput = socketReader.readLine();
             int studentId = Integer.parseInt(studentIdInput);// Consume newline
             socketReader.readLine(); // Consume newline
             User user = IUserDao.findUserByStudentId(studentId);
             displayUser(user);
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
+            socketWriter.println("Error: " + e.getMessage());
         } catch (InputMismatchException | IOException e) {
-            System.out.println("Invalid input. Please enter a valid student ID.");
+            socketWriter.println("Invalid input. Please enter a valid student ID.");
             socketReader.readLine(); // Clear the invalid input from the scanner
         }
     }
