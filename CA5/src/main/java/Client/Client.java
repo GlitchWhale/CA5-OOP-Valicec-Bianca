@@ -1,3 +1,5 @@
+package Client;
+
 import Server.DTOs.User;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
