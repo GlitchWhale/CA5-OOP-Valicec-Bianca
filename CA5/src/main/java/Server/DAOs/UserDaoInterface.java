@@ -27,4 +27,5 @@ public interface UserDaoInterface {
     String findUserJsonByStudentId(int studentId) throws DaoException;
 
     String usersListToJson(List<User> list) throws DaoException;
+
 }

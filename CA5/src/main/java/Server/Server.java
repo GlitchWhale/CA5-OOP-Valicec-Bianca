@@ -1,19 +1,19 @@
 package Server;
 
+import Server.Comparators.UserGradeComparator;
+import Server.DAOs.MySqlUserDao;
+import Server.DAOs.UserDaoInterface;
+import Server.DTOs.User;
+import Server.Exceptions.DaoException;
+import com.google.gson.Gson;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.InputMismatchException;
 import java.util.List;
-
-import Server.Comparators.UserGradeComparator;
-import Server.DAOs.MySqlUserDao;
-import Server.DAOs.UserDaoInterface;
-import Server.DTOs.User;
-import Server.Exceptions.DaoException;
 
 /**
  * Main Author: Bianca Valicec
@@ -82,15 +82,16 @@ public class Server {
  **/
 class ClientHandler implements Runnable {
     final int clientNumber;
-    static BufferedReader socketReader;
-    static PrintWriter socketWriter;
+    private final UserDaoInterface IUserDao = new MySqlUserDao();
+    BufferedReader socketReader;
+    PrintWriter socketWriter;
     Socket clientSocket;
 
     public ClientHandler(Socket clientSocket, int clientNumber) {
         this.clientSocket = clientSocket;
         this.clientNumber = clientNumber;
         try {
-            this.socketWriter = new PrintWriter(clientSocket.getOutputStream(), true);
+            socketWriter = new PrintWriter(clientSocket.getOutputStream(), true);
             socketReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         } catch (IOException e) {
             System.out.println("Error creating client handler: " + e.getMessage());
@@ -103,12 +104,15 @@ class ClientHandler implements Runnable {
      **/
     @Override
     public void run() {
-        String request;
         try {
-            while ((request = socketReader.readLine()) != null) {
-                System.out.println("Server: (ClientHandler): Read command from client " + clientNumber + ": " + request);
+            while (true) {
+                String command = socketReader.readLine();
+                if (command == null) {
+                    break;
+                }
+                System.out.println("Server: (ClientHandler): Read command from client " + clientNumber + ": " + command);
 
-                int choice = Integer.parseInt(request);
+                int choice = Integer.parseInt(command);
                 switch (choice) {
                     case 1:
                         findAllUsers();
@@ -135,6 +139,12 @@ class ClientHandler implements Runnable {
                         convertUsersListToJson();
                         break;
                     case 9:
+                        displayEntityById();
+                        break;
+                    case 10:
+                        displayAllEntities();
+                        break;
+                    case 0:
                         socketWriter.println("Sorry to see you leaving. Goodbye.");
                         System.out.println("Server message: Client has notified us that it is quitting.");
                         break;
@@ -143,58 +153,40 @@ class ClientHandler implements Runnable {
                         System.out.println("Server message: Invalid request from client.");
                         break;
                 }
-
+                System.out.println("Server: (ClientHandler): Command processed.");
             }
         } catch (IOException ex) {
             System.out.println("Error reading from client: " + ex.getMessage());
         } finally {
-            socketWriter.close();
             try {
+                socketWriter.close();
                 socketReader.close();
-                this.clientSocket.close();
+                clientSocket.close();
             } catch (IOException ex) {
                 System.out.println("Error closing resources: " + ex.getMessage());
             }
         }
         System.out.println("Server: (ClientHandler): Handler for Client " + clientNumber + " is terminating .....");
-
-    }
-
-    private static final UserDaoInterface IUserDao = new MySqlUserDao();
-
-    /**
-     * Main Author: Bianca Valicec
-     **/
-    private static void displayUsers(List<User> users) {
-        // Display header
-        socketWriter.printf("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n", "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester");
-        // Display each user
-        for (User user : users) {
-            displayUser(user);
-        }
-    }
-
-    /**
-     * Main Author: Bianca Valicec
-     **/
-    private static void displayUser(User user) {
-        if (user != null) {
-            socketWriter.printf("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
-                    user.getId(), user.getStudentId(), user.getFirstName(), user.getLastName(),
-                    user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester());
-        } else {
-            socketWriter.println("User not found.");
-        }
     }
 
     /**
      * Main Author: Liam Moore
+     * Other Contributors: Bianca Valicec
      **/
-    private static void findAllUsers() {
+    private void findAllUsers() {
         try {
-            socketWriter.println("\n--- Finding all users ---");
             List<User> users = IUserDao.findAllUsers();
-            displayUsers(users);
+            if (users.isEmpty()) {
+                socketWriter.println("No users found.");
+            } else {
+                StringBuilder response = new StringBuilder();
+                response.append(String.format("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n",
+                        "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester"));
+                for (User user : users) {
+                    response.append(formatUser(user)).append("\n");
+                }
+                socketWriter.println(response.toString());
+            }
         } catch (DaoException e) {
             socketWriter.println("Error: " + e.getMessage());
         }
@@ -204,177 +196,238 @@ class ClientHandler implements Runnable {
      * Main Author: Liam Moore
      * Other Contributors: Bianca Valicec
      **/
-    private static void findUserByStudentId() throws IOException {
+    private void findUserByStudentId() {
         try {
-            socketWriter.println("\n--- Finding user by student ID ---");
-            socketWriter.print("Enter student ID: ");
-            String studentIdInput = socketReader.readLine();
-            int studentId = Integer.parseInt(studentIdInput);// Consume newline
-            socketReader.readLine(); // Consume newline
-            User user = IUserDao.findUserByStudentId(studentId);
-            displayUser(user);
-        } catch (DaoException e) {
-            socketWriter.println("Error: " + e.getMessage());
-        } catch (InputMismatchException | IOException e) {
-            socketWriter.println("Invalid input. Please enter a valid student ID.");
-            socketReader.readLine(); // Clear the invalid input from the scanner
-        }
-    }
-
-    /**
-     * Main Author: Bianca Valicec
-     **/
-    private static void deleteUserByStudentId() throws IOException {
-        try {
-            System.out.println("\n--- Deleting user by student ID ---");
-            System.out.print("Enter student ID to delete: ");
-            String studentIdInput = socketReader.readLine();
-            int studentId = Integer.parseInt(studentIdInput);
-            socketReader.readLine(); // Consume newline
-            boolean deletionResult = IUserDao.deleteUserByStudentId(studentId);
-            if (deletionResult) {
-                System.out.println("User with student ID " + studentId + " deleted successfully.");
+            socketWriter.println("Enter student ID: ");
+            String studentIdStr = "";
+            while (studentIdStr.isEmpty()) {
+                studentIdStr = socketReader.readLine();
+                if (studentIdStr == null) {
+                    break;
+                }
+            }
+            if (studentIdStr != null) {
+                int studentId = Integer.parseInt(studentIdStr);
+                System.out.println("Server: (ClientHandler): Received student ID from client: " + studentId); // Debug statement
+                User user = IUserDao.findUserByStudentId(studentId);
+                displayUser(user);
             } else {
-                System.out.println("No user found with student ID " + studentId + ".");
+                socketWriter.println("Error: No input received from client.");
             }
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (InputMismatchException | IOException e) {
-            System.out.println("Invalid input. Please enter a valid student ID.");
-            socketReader.readLine(); // Clear the invalid input from the scanner
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            socketWriter.println("Invalid input. Please enter a valid student ID.");
+        } catch (IOException e) {
+            socketWriter.println("Error reading input from client: " + e.getMessage());
+        }
+    }
+
+
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void deleteUserByStudentId() {
+        try {
+            socketWriter.println("Enter student ID to delete: ");
+            String studentIdStr = socketReader.readLine();
+            int studentId = Integer.parseInt(studentIdStr);
+            boolean deletionResult = IUserDao.deleteUserByStudentId(studentId);
+            if (deletionResult) {
+                socketWriter.println("User with student ID " + studentId + " deleted successfully.");
+            } else {
+                socketWriter.println("No user found with student ID " + studentId + ".");
+            }
+        } catch (DaoException e) {
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException | IOException e) {
+            socketWriter.println("Invalid input. Please enter a valid student ID.");
         }
     }
 
     /**
      * Main Author: Bianca Valicec
      **/
-    private static void insertNewUser() throws IOException {
+    private void insertNewUser() {
         try {
-            System.out.println("\n--- Inserting new user ---");
-            System.out.print("Enter student ID: ");
-            String studentIdInput = socketReader.readLine();
-            int studentId = Integer.parseInt(studentIdInput);
-            socketReader.readLine(); // Consume newline
-            System.out.print("Enter first name: ");
+            socketWriter.println("Enter student ID: ");
+            int studentId = Integer.parseInt(socketReader.readLine());
+            socketWriter.println("Enter first name: ");
             String firstName = socketReader.readLine();
-            System.out.print("Enter last name: ");
+            socketWriter.println("Enter last name: ");
             String lastName = socketReader.readLine();
-            System.out.print("Enter course ID: ");
-            int courseId = socketReader.read();
-            socketReader.readLine(); // Consume newline
-            System.out.print("Enter course name: ");
+            socketWriter.println("Enter course ID: ");
+            int courseId = Integer.parseInt(socketReader.readLine());
+            socketWriter.println("Enter course name: ");
             String courseName = socketReader.readLine();
-            System.out.print("Enter grade: ");
-            String gradeInput = socketReader.readLine();
-            float grade = Float.parseFloat(gradeInput);
-            socketReader.readLine();// Consume newline
-            System.out.print("Enter semester: ");
+            socketWriter.println("Enter grade: ");
+            float grade = Float.parseFloat(socketReader.readLine());
+            socketWriter.println("Enter semester: ");
             String semester = socketReader.readLine();
 
             User newUser = new User(studentId, firstName, lastName, courseId, courseName, grade, semester);
             User insertedUser = IUserDao.insertUser(newUser);
-            System.out.println("User inserted successfully. ID: " + insertedUser.getId());
+            socketWriter.println("User inserted successfully. ID: " + insertedUser.getId());
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter valid data.");
-            socketReader.readLine(); // Clear the invalid input from the scanner
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException | IOException e) {
+            socketWriter.println("Invalid input. Please enter valid data.");
         }
     }
-
     /**
      * Main Author: Bianca Valicec
      **/
-    private static void updateUserByStudentId() throws IOException {
+    private void updateUserByStudentId() {
         try {
-            System.out.println("\n--- Updating user by student ID ---");
-            System.out.print("Enter student ID to update: ");
-            String studentIdInput = socketReader.readLine();
-            int studentIdToUpdate = Integer.parseInt(studentIdInput);
-            socketReader.readLine(); // Consume newline
+            socketWriter.println("Enter student ID to update: ");
+            int studentIdToUpdate = Integer.parseInt(socketReader.readLine());
 
-            System.out.print("Enter new first name: ");
+            socketWriter.println("Enter new first name: ");
             String newFirstName = socketReader.readLine();
-            System.out.print("Enter new last name: ");
+            socketWriter.println("Enter new last name: ");
             String newLastName = socketReader.readLine();
-            System.out.print("Enter new course ID: ");
-            String courseId = socketReader.readLine();
-            int newCourseId = Integer.parseInt(courseId);
-            socketReader.readLine(); // Consume newline
-            System.out.print("Enter new course name: ");
+            socketWriter.println("Enter new course ID: ");
+            int newCourseId = Integer.parseInt(socketReader.readLine());
+            socketWriter.println("Enter new course name: ");
             String newCourseName = socketReader.readLine();
-            System.out.print("Enter new grade: ");
-            String grade = socketReader.readLine();
-            float newGrade = Float.parseFloat(grade);
-            socketReader.readLine(); // Consume newline
-            System.out.print("Enter new semester: ");
+            socketWriter.println("Enter new grade: ");
+            float newGrade = Float.parseFloat(socketReader.readLine());
+            socketWriter.println("Enter new semester: ");
             String newSemester = socketReader.readLine();
 
             User updatedUser = new User(newFirstName, newLastName, newCourseId, newCourseName, newGrade, newSemester);
             IUserDao.updateUserByStudentId(studentIdToUpdate, updatedUser);
-            System.out.println("User updated successfully.");
+            socketWriter.println("User updated successfully.");
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (InputMismatchException e) {
-            System.out.println("Invalid input. Please enter valid data.");
-            socketReader.readLine(); // Clear the invalid input from the scanner
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException | IOException e) {
+            socketWriter.println("Invalid input. Please enter valid data.");
         }
     }
 
     /**
      * Main Author: Bianca Valicec
      **/
-    private static void findUsersUsingFilter() {
+    private void findUsersUsingFilter() {
         try {
-            System.out.println("\n--- Finding users using filter ---");
-            // Call DAO method to find users using a filter
             List<User> filteredUsers = IUserDao.findUsersUsingFilter(new UserGradeComparator());
-            // Display filtered users
             displayUsers(filteredUsers);
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
+            socketWriter.println("Error: " + e.getMessage());
         }
     }
 
     /**
      * Main Author: Bianca Valicec
      **/
-    private static void convertUserToJson() throws IOException {
+    private void convertUserToJson() {
         try {
-            System.out.println("\n--- Converting user to JSON ---");
-            System.out.print("Enter student ID: ");
-            String studentIdInput = socketReader.readLine();
-            int studentId = Integer.parseInt(studentIdInput);
-            socketReader.readLine(); // Consume newline
+            socketWriter.println("Enter student ID: ");
+            int studentId = Integer.parseInt(socketReader.readLine());
             String userJson = IUserDao.findUserJsonByStudentId(studentId);
-            System.out.println(userJson);
+            socketWriter.println(userJson);
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
-        } catch (InputMismatchException | IOException e) {
-            System.out.println("Invalid input. Please enter a valid student ID.");
-            socketReader.readLine(); // Clear the invalid input from the scanner
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException | IOException e) {
+            socketWriter.println("Invalid input. Please enter a valid student ID.");
         }
     }
 
     /**
      * Main Author: Bianca Valicec
      **/
-    private static void convertUsersListToJson() {
+    private void convertUsersListToJson() {
         try {
-            System.out.println("\n--- Converting list of users to JSON ---");
-            // Call DAO method to get list of users
             List<User> users = IUserDao.findAllUsers();
-            // Convert list of users to JSON
             String json = IUserDao.usersListToJson(users);
-            // Display JSON
-            System.out.println("JSON representation of users:\n" + json);
+            socketWriter.println("JSON representation of users:\n" + json);
         } catch (DaoException e) {
-            System.out.println("Error: " + e.getMessage());
+            socketWriter.println("Error: " + e.getMessage());
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    // Helper methods for displaying users
+    private void displayUsers(List<User> users) {
+        StringBuilder response = new StringBuilder();
+        if (users.isEmpty()) {
+            response.append("No users found.");
+        } else {
+            // Append header
+            response.append(String.format("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n",
+                    "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester"));
+            // Append each user
+            for (User user : users) {
+                response.append(String.format("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
+                        user.getId(), user.getStudentId(), user.getFirstName(), user.getLastName(),
+                        user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester()));
+            }
+        }
+        socketWriter.println(response.toString());
+    }
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void displayUser(User user) {
+        if (user != null) {
+            StringBuilder response = new StringBuilder();
+            // Append header
+            response.append(String.format("%-10s %-10s %-15s %-15s %-10s %-20s %-10s %-10s%n",
+                    "ID", "Student ID", "First Name", "Last Name", "Course ID", "Course Name", "Grade", "Semester"));
+            // Append user
+            response.append(String.format("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s%n",
+                    user.getId(), user.getStudentId(), user.getFirstName(), user.getLastName(),
+                    user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester()));
+            socketWriter.println(response.toString());
+        } else {
+            socketWriter.println("User not found.");
+        }
+    }
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private String formatUser(User user) {
+        return String.format("%-10d %-10d %-15s %-15s %-10d %-20s %-10.2f %-10s",
+                user.getId(), user.getStudentId(), user.getFirstName(), user.getLastName(),
+                user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester());
+    }
+
+    private void displayEntityById() {
+        try {
+            socketWriter.println("Enter ID of the entity to display: ");
+            int entityId = Integer.parseInt(socketReader.readLine());
+            // Assuming you have a method in UserDaoInterface to find entity by ID
+            User entity = IUserDao.findUserByStudentId(entityId);
+            if (entity != null) {
+                String json = IUserDao.findUserJsonByStudentId(entityId);
+                socketWriter.println(json);
+            } else {
+                socketWriter.println("Entity not found.");
+            }
+        } catch (DaoException e) {
+            socketWriter.println("Error: " + e.getMessage());
+        } catch (NumberFormatException | IOException e) {
+            socketWriter.println("Invalid input. Please enter a valid ID.");
+        }
+    }
+
+    private void displayAllEntities() {
+        try {
+            List<User> users = IUserDao.findAllUsers(); // Assuming IUserDao has a method to retrieve all users
+            String json = convertUsersListToJson(users);
+            socketWriter.println(json);
+        } catch (DaoException e) {
+            socketWriter.println("Error: " + e.getMessage());
+        }
+    }
+
+    private String convertUsersListToJson(List<User> users) {
+        Gson gson = new Gson();
+        return gson.toJson(users);
+    }
 }
