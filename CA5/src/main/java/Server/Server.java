@@ -144,6 +144,10 @@ class ClientHandler implements Runnable {
                     case 10:
                         displayAllEntities();
                         break;
+                    case 11:
+                        String jsonRequest = socketReader.readLine();
+                        addEntity(jsonRequest, socketWriter);
+                        break;
                     case 0:
                         socketWriter.println("Sorry to see you leaving. Goodbye.");
                         System.out.println("Server message: Client has notified us that it is quitting.");
@@ -433,5 +437,26 @@ class ClientHandler implements Runnable {
     private String convertUsersListToJson(List<User> users) {
         Gson gson = new Gson();
         return gson.toJson(users);
+    }
+
+    private void addEntity(String jsonRequest, PrintWriter out) {
+        Gson gson = new Gson();
+        try {
+            // Deserialize JSON request into User object
+            User newUser = gson.fromJson(jsonRequest, User.class);
+
+            // Insert the User object into the database
+            User insertedUser = IUserDao.insertUser(newUser);
+
+            if (insertedUser != null) {
+                // Serialize the inserted User object (including the auto-generated ID if applicable) into JSON format
+                String jsonResponse = gson.toJson(insertedUser);
+                out.println(jsonResponse); // Send successful response to client
+            } else {
+                out.println("Error: Failed to insert user."); // Send error response to client
+            }
+        } catch (DaoException e) {
+            out.println("Error: " + e.getMessage()); // Send error response to client
+        }
     }
 }

@@ -78,6 +78,9 @@ public class Client {
                     case 10:
                         displayAllEntities(in);
                         break;
+                    case 11:
+                        addEntity(out, in, consoleInput);
+                        break;
                     case 8:
                     case 6:
                     case 1:
@@ -271,6 +274,69 @@ public class Client {
         } catch (IOException e) {
             System.out.println("IO Exception: " + e.getMessage());
         }
+    }
+
+    private void addEntity(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+//        Implement a client-side menu item that will allow the user to input data for an
+//entity, serialize the data into a JSON formatted request and send the JSON request
+//to the server. The server will extract the received JSON data and add the entity
+//details to the database using a relevant DAO method (INSERT), and will send a
+//success/failure response to the client. On successful insertion, the response will
+//return the Entity object (as JSON) data incorporating the newly allocated ID (if the ID
+//was auto generated). This will be sent from server to client, and the client will
+//display the newly added entity, along with its auto generated ID. If the insert fails,
+//and appropriate error (as JSON) should be returned to the client and an appropriate
+//client-side message displayed for the user.
+        Gson gson = new Gson();
+
+        // Input new entity data from user
+        System.out.println("Enter new user details:");
+        System.out.print("Student ID: ");
+        int studentId = Integer.parseInt(consoleInput.readLine());
+        System.out.print("First Name: ");
+        String firstName = consoleInput.readLine();
+        System.out.print("Last Name: ");
+        String lastName = consoleInput.readLine();
+        System.out.print("Course ID: ");
+        int courseId = Integer.parseInt(consoleInput.readLine());
+        System.out.print("Course Name: ");
+        String courseName = consoleInput.readLine();
+        System.out.print("Grade: ");
+        float grade = Float.parseFloat(consoleInput.readLine());
+        System.out.print("Semester: ");
+        String semester = consoleInput.readLine();
+
+        // Create User object
+        User newUser = new User(studentId, firstName, lastName, courseId, courseName, grade, semester);
+        String jsonRequest = gson.toJson(newUser);
+
+        // Send JSON request to server
+        out.println(jsonRequest);
+
+        // Receive response from server
+        String jsonResponse = in.readLine();
+        handleInsertResponse(jsonResponse);
+    }
+
+    private void handleInsertResponse(String jsonResponse) {
+        Gson gson = new Gson();
+        if (jsonResponse.startsWith("{")) { // Check if response is a JSON object
+            User insertedUser = gson.fromJson(jsonResponse, User.class);
+            System.out.println("Entity inserted successfully:");
+            System.out.println(insertedUser);
+        } else if (jsonResponse.startsWith("Error:")) { // Check if response is an error message
+            System.out.println(jsonResponse);
+        } else { // Unexpected response
+            System.out.println("Unexpected response from server.");
+        }
+    }
+
+
+    private void deleteEntityById(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+//       In a manner similar to above, provide a menu item that will delete an entity by ID,
+//send a command (as JSON) to the server to undertake the delete, and display an
+//appropriate message on the client.
+
     }
 
     private void displayAllEntities(BufferedReader in) throws IOException {
