@@ -198,14 +198,16 @@ class ClientHandler implements Runnable {
      **/
     private void findUserByStudentId() {
         try {
-            socketWriter.println("Enter student ID: ");
+            //flush the buffer
+            socketReader.readLine();
+
             String studentIdStr = "";
-            while (studentIdStr.isEmpty()) {
-                studentIdStr = socketReader.readLine();
-                if (studentIdStr == null) {
-                    break;
-                }
-            }
+            //while (studentIdStr.isEmpty()) {
+            studentIdStr = socketReader.readLine();
+//                if (studentIdStr == null) {
+//                    break;
+//                }
+            //}
             if (studentIdStr != null) {
                 int studentId = Integer.parseInt(studentIdStr);
                 System.out.println("Server: (ClientHandler): Received student ID from client: " + studentId); // Debug statement
@@ -224,13 +226,12 @@ class ClientHandler implements Runnable {
     }
 
 
-
     /**
      * Main Author: Bianca Valicec
      **/
     private void deleteUserByStudentId() {
         try {
-            socketWriter.println("Enter student ID to delete: ");
+            socketReader.readLine(); // Flush the buffer
             String studentIdStr = socketReader.readLine();
             int studentId = Integer.parseInt(studentIdStr);
             boolean deletionResult = IUserDao.deleteUserByStudentId(studentId);
@@ -251,19 +252,20 @@ class ClientHandler implements Runnable {
      **/
     private void insertNewUser() {
         try {
-            socketWriter.println("Enter student ID: ");
+            socketReader.readLine(); // Flush the buffer
+
             int studentId = Integer.parseInt(socketReader.readLine());
-            socketWriter.println("Enter first name: ");
+
             String firstName = socketReader.readLine();
-            socketWriter.println("Enter last name: ");
+
             String lastName = socketReader.readLine();
-            socketWriter.println("Enter course ID: ");
+
             int courseId = Integer.parseInt(socketReader.readLine());
-            socketWriter.println("Enter course name: ");
+
             String courseName = socketReader.readLine();
-            socketWriter.println("Enter grade: ");
+
             float grade = Float.parseFloat(socketReader.readLine());
-            socketWriter.println("Enter semester: ");
+
             String semester = socketReader.readLine();
 
             User newUser = new User(studentId, firstName, lastName, courseId, courseName, grade, semester);
@@ -275,25 +277,26 @@ class ClientHandler implements Runnable {
             socketWriter.println("Invalid input. Please enter valid data.");
         }
     }
+
     /**
      * Main Author: Bianca Valicec
      **/
     private void updateUserByStudentId() {
         try {
-            socketWriter.println("Enter student ID to update: ");
+            socketReader.readLine(); // Flush the buffer
+
             int studentIdToUpdate = Integer.parseInt(socketReader.readLine());
 
-            socketWriter.println("Enter new first name: ");
             String newFirstName = socketReader.readLine();
-            socketWriter.println("Enter new last name: ");
+
             String newLastName = socketReader.readLine();
-            socketWriter.println("Enter new course ID: ");
+
             int newCourseId = Integer.parseInt(socketReader.readLine());
-            socketWriter.println("Enter new course name: ");
+
             String newCourseName = socketReader.readLine();
-            socketWriter.println("Enter new grade: ");
+
             float newGrade = Float.parseFloat(socketReader.readLine());
-            socketWriter.println("Enter new semester: ");
+
             String newSemester = socketReader.readLine();
 
             User updatedUser = new User(newFirstName, newLastName, newCourseId, newCourseName, newGrade, newSemester);
@@ -323,7 +326,8 @@ class ClientHandler implements Runnable {
      **/
     private void convertUserToJson() {
         try {
-            socketWriter.println("Enter student ID: ");
+            socketReader.readLine(); // Flush the buffer
+
             int studentId = Integer.parseInt(socketReader.readLine());
             String userJson = IUserDao.findUserJsonByStudentId(studentId);
             socketWriter.println(userJson);
@@ -399,7 +403,7 @@ class ClientHandler implements Runnable {
 
     private void displayEntityById() {
         try {
-            socketWriter.println("Enter ID of the entity to display: ");
+            socketReader.readLine(); // Flush the buffer
             int entityId = Integer.parseInt(socketReader.readLine());
             // Assuming you have a method in UserDaoInterface to find entity by ID
             User entity = IUserDao.findUserByStudentId(entityId);

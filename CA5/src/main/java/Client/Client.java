@@ -57,21 +57,31 @@ public class Client {
                 }
 
                 switch (commandInt) {
-                    case 1:
                     case 2:
+                        findUserByStudentId(out, in, consoleInput);
+                        break;
                     case 3:
+                        deleteUserByStudentId(out, in, consoleInput);
+                        break;
                     case 4:
+                        insertNewUser(out, in, consoleInput);
+                        break;
                     case 5:
-                    case 6:
+                        updateUserByStudentId(out, in, consoleInput);
+                        break;
                     case 7:
-                    case 8:
-                        handleStandardCommand(in);
+                        convertUserToJson(out, in, consoleInput);
                         break;
                     case 9:
                         displayEntityById(out, in, consoleInput);
                         break;
                     case 10:
                         displayAllEntities(in);
+                        break;
+                    case 8:
+                    case 6:
+                    case 1:
+                        handleStandardCommand(in);
                         break;
                     default:
                         System.out.println("Invalid command.");
@@ -98,6 +108,149 @@ public class Client {
             if (response.isEmpty()) {
                 break;  // Exit the loop when an empty line is received
             }
+        }
+    }
+
+    private void findUserByStudentId(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        try {
+            out.println("2"); // Send command for Find User By Student ID
+            System.out.print("Enter the student ID of the user to find: ");
+            String studentId = consoleInput.readLine();
+            out.println(studentId);
+
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.isEmpty()) {
+                    break;  // Exit the loop when an empty line is received
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
+        }
+    }
+
+    private void deleteUserByStudentId(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        try {
+            out.println("3"); // Send command for Delete User By Student ID
+            System.out.print("Enter the student ID of the user to delete: ");
+            String studentId = consoleInput.readLine();
+            out.println(studentId);
+
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.isEmpty()) {
+                    break;  // Exit the loop when an empty line is received
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
+        }
+    }
+
+    private void insertNewUser(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        try {
+            out.println("4"); // Send command for Insert New User
+            System.out.print("Enter the student ID of the user to insert: ");
+            String studentId = consoleInput.readLine();
+            out.println(studentId);
+
+            System.out.print("Enter the first name of the user to insert: ");
+            String firstName = consoleInput.readLine();
+            out.println(firstName);
+
+            System.out.print("Enter the last name of the user to insert: ");
+            String lastName = consoleInput.readLine();
+            out.println(lastName);
+
+            System.out.println("Enter a course ID of the User to insert: ");
+            String courseId = consoleInput.readLine();
+            out.println(courseId);
+
+            System.out.println("Enter a course name of the User to insert: ");
+            String courseName = consoleInput.readLine();
+            out.println(courseName);
+
+            System.out.println("Enter a course grade of the User to insert: ");
+            String courseGrade = consoleInput.readLine();
+            out.println(courseGrade);
+
+            System.out.println("Enter the semester of the User to insert: (Semester 1, Semester 2)");
+            String semester = consoleInput.readLine();
+            out.println(semester);
+
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.isEmpty()) {
+                    break;  // Exit the loop when an empty line is received
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
+        }
+    }
+
+    private void updateUserByStudentId(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        try {
+            out.println("5"); // Send command for Update User By Student ID
+            System.out.print("Enter the student ID of the user to update: ");
+            String studentId = consoleInput.readLine();
+            out.println(studentId);
+
+            System.out.print("Enter the first name of the user to update: ");
+            String firstName = consoleInput.readLine();
+            out.println(firstName);
+
+            System.out.print("Enter the last name of the user to update: ");
+            String lastName = consoleInput.readLine();
+            out.println(lastName);
+
+            System.out.println("Enter a course ID of the User to update: ");
+            String courseId = consoleInput.readLine();
+            out.println(courseId);
+
+            System.out.println("Enter a course name of the User to update: ");
+            String courseName = consoleInput.readLine();
+            out.println(courseName);
+
+            System.out.println("Enter a course grade of the User to update: ");
+            String courseGrade = consoleInput.readLine();
+            out.println(courseGrade);
+
+            System.out.println("Enter the semester of the User to update: (Semester 1, Semester 2)");
+            String semester = consoleInput.readLine();
+            out.println(semester);
+
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.isEmpty()) {
+                    break;  // Exit the loop when an empty line is received
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
+        }
+    }
+
+    private void convertUserToJson(PrintWriter out, BufferedReader in, BufferedReader consoleInput) throws IOException {
+        try {
+            out.println("7"); // Send command for Convert List of Users to JSON
+            System.out.print("Enter the student ID of the user to convert to JSON: ");
+            String studentId = consoleInput.readLine();
+            out.println(studentId);
+
+            String response;
+            while ((response = in.readLine()) != null) {
+                System.out.println(response);
+                if (response.isEmpty()) {
+                    break;  // Exit the loop when an empty line is received
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("IO Exception: " + e.getMessage());
         }
     }
 
