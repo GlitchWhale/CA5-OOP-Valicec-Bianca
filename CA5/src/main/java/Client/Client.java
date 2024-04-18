@@ -2,6 +2,7 @@ package Client;
 
 import Server.DTOs.User;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
@@ -11,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Main Author: Bianca Valicec
+ **/
 public class Client {
 
     private static final int SERVER_PORT = 8080;
@@ -52,10 +57,6 @@ public class Client {
                 int commandInt = Integer.parseInt(command);
                 out.println(commandInt);
 
-                if (commandInt == 0) {
-                    break;  // Exit the loop if the command is 0 (Exit)
-                }
-
                 switch (commandInt) {
                     case 2:
                         findUserByStudentId(out, in, consoleInput);
@@ -80,6 +81,9 @@ public class Client {
                         break;
                     case 11:
                         addEntity(out, in, consoleInput);
+                        break;
+                    case 0:
+                        exit(out);
                         break;
                     case 8:
                     case 6:
@@ -337,6 +341,22 @@ public class Client {
 //send a command (as JSON) to the server to undertake the delete, and display an
 //appropriate message on the client.
 
+        // Request user input for entity ID to delete
+        System.out.println("Enter ID of the entity to delete: ");
+        String entityIdStr = consoleInput.readLine();
+        int entityId = Integer.parseInt(entityIdStr);
+
+        // Construct JSON request with the entity ID to delete
+        JsonObject jsonRequest = new JsonObject();
+        jsonRequest.addProperty("id", entityId);
+
+        // Send JSON request to the server
+        out.println(jsonRequest.toString());
+
+        // Receive response from the server
+        String response = in.readLine();
+        System.out.println("Server response: " + response);
+
     }
 
     private void displayAllEntities(BufferedReader in) throws IOException {
@@ -351,5 +371,15 @@ public class Client {
         for (User user : users) {
             System.out.println(user); // Assuming User class has a toString() method
         }
+    }
+
+    private void exit(PrintWriter out) {
+        // Send a notification to the server that the client is quitting
+        out.println("0");
+        // Close the PrintWriter and BufferedReader
+        out.close();
+        // Optionally, close any other resources if needed
+        // To Terminate the client application
+        System.exit(0);
     }
 }

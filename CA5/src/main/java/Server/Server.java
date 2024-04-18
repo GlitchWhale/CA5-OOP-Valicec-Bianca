@@ -6,6 +6,7 @@ import Server.DAOs.UserDaoInterface;
 import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -149,8 +150,7 @@ class ClientHandler implements Runnable {
                         addEntity(jsonRequest, socketWriter);
                         break;
                     case 0:
-                        socketWriter.println("Sorry to see you leaving. Goodbye.");
-                        System.out.println("Server message: Client has notified us that it is quitting.");
+                        handleExit(socketWriter);
                         break;
                     default:
                         socketWriter.println("error I'm sorry I don't understand your request");
@@ -405,6 +405,9 @@ class ClientHandler implements Runnable {
                 user.getCourseId(), user.getCourseName(), user.getGrade(), user.getSemester());
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private void displayEntityById() {
         try {
             socketReader.readLine(); // Flush the buffer
@@ -424,6 +427,9 @@ class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private void displayAllEntities() {
         try {
             List<User> users = IUserDao.findAllUsers(); // Assuming IUserDao has a method to retrieve all users
@@ -434,11 +440,18 @@ class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private String convertUsersListToJson(List<User> users) {
         Gson gson = new Gson();
         return gson.toJson(users);
     }
 
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
     private void addEntity(String jsonRequest, PrintWriter out) {
         Gson gson = new Gson();
         try {
@@ -459,4 +472,40 @@ class ClientHandler implements Runnable {
             out.println("Error: " + e.getMessage()); // Send error response to client
         }
     }
+
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void deleteEntityById(String jsonRequest, PrintWriter out) throws DaoException {
+        Gson gson = new Gson();
+        JsonObject jsonObject = gson.fromJson(jsonRequest, JsonObject.class);
+
+        // Extract entity ID from JSON request
+        int entityId = jsonObject.get("id").getAsInt();
+
+        // Perform deletion based on entity ID
+        boolean deletionResult = IUserDao.deleteUserByStudentId(entityId);
+
+        // Send appropriate response to the client
+        if (deletionResult) {
+            out.println("Entity with ID " + entityId + " deleted successfully.");
+        } else {
+            out.println("Error: Failed to delete entity with ID " + entityId + ".");
+        }
+    }
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void handleExit(PrintWriter out) {
+        out.println("Client is quitting. Goodbye.");
+        // Optionally, perform any cleanup or logging operations
+        // Close the PrintWriter and BufferedReader
+        out.close();
+        // Terminate the client handler thread
+        Thread.currentThread().interrupt();
+    }
+
+
 }
