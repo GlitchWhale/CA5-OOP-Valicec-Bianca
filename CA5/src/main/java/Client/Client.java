@@ -18,6 +18,7 @@ import java.util.Map;
  **/
 public class Client {
 
+    private static final String IMAGE_PATH = "";
     private static final int SERVER_PORT = 8080;
     private static final String SERVER_HOST = "localhost";
 
@@ -90,8 +91,9 @@ public class Client {
                         deleteEntityById(out, in, consoleInput);
                         break;
                     case 13:
-                        String fileName = chooseFile(consoleInput);
-                        receiveFile(new DataInputStream(socket.getInputStream()), fileName);
+                        out.println("13"); // Send command for Download Image
+                        String fileName = getImageListSendRequest(out, in);
+                        receiveFile(new BufferedInputStream(socket.getInputStream()), IMAGE_PATH + fileName);
                         break;
                     case 0:
                         exit(out);
@@ -385,38 +387,41 @@ public class Client {
         }
     }
 
-    private static void receiveFile(DataInputStream dataInputStream, String fileName)
-            throws IOException {
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
 
-        long bytesRemaining = dataInputStream.readLong(); // Read file size in bytes
-        byte[] buffer = new byte[4 * 1024]; // 4 kilobyte buffer
-
-        int bytesRead;
-        while (bytesRemaining > 0 && (bytesRead = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, bytesRemaining))) != -1) {
-            fileOutputStream.write(buffer, 0, bytesRead);
-            bytesRemaining -= bytesRead;
+    private String getImageListSendRequest(PrintWriter out, BufferedReader in) throws IOException {
+        String response;
+        while ((response = in.readLine()) != null) {
+            System.out.println(response);
+            if (response.isEmpty()) {
+                break;  // Exit the loop when an empty line is received
+            }
+        }
+        //get users choice
+        BufferedReader consoleInput = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Enter the name of the image you would like to download: ");
+        String fileName = consoleInput.readLine();
+        //send users choice back to server
+        out.println(fileName);
+        int fileNumber = Integer.parseInt(fileName);
+        switch (fileNumber) {
+            case 1:
+                fileName = "flamingo.jpg";
+                break;
+            case 2:
+                fileName = "macaw.jpg";
+                break;
+            case 3:
+                fileName = "robin.jpg";
+                break;
+            case 4:
+                fileName = "toucan.jpg";
+                break;
+            default:
+                System.out.println("Invalid response from server.");
+                break;
         }
 
-        fileOutputStream.close();
-        System.out.println("File " + fileName + " received successfully.");
-    }
-
-    private String chooseFile(BufferedReader consoleInput) throws IOException {
-        System.out.println("Choose a file to download:");
-        System.out.println("1. flamingo");
-        System.out.println("2. macaw");
-        System.out.println("3. robin");
-        System.out.println("4. toucan");
-        System.out.print("Enter the number of the file you would like to download: ");
-        String fileNumber = consoleInput.readLine();
-        return switch (fileNumber) {
-            case "1" -> "src/main/java/Images/flamingo.jpg";
-            case "2" -> "src/main/java/Images/macaw.jpg";
-            case "3" -> "src/main/java/Images/robin.jpg";
-            case "4" -> "src/main/java/Images/toucan.jpg";
-            default -> null;
-        };
+        return fileName;
     }
 
     private static void receiveFile(BufferedInputStream inputStream, String fileName) throws IOException {

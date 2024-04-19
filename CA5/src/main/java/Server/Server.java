@@ -81,6 +81,8 @@ public class Server {
  * Main Author: Bianca Valicec
  **/
 class ClientHandler implements Runnable {
+
+    private final String IMAGE_PATH = "C:\\Users\\biava\\Documents\\GitHub\\OOProgrammingCA5\\CA5\\src\\main\\java\\Images\\";
     final int clientNumber;
     private final UserDaoInterface IUserDao = new MySqlUserDao();
     BufferedReader socketReader;
@@ -153,7 +155,11 @@ class ClientHandler implements Runnable {
                         deleteEntityById(jsonRequest, socketWriter);
                         break;
                     case 13:
-                        String path = socketReader.readLine();
+                        ImageInfo(socketWriter);
+                        //flush the buffer
+                        socketReader.readLine();
+                        int fileNumber = Integer.parseInt(socketReader.readLine());
+                        String path = handleResponse(socketReader, fileNumber);
                         BufferedOutputStream outputStream = new BufferedOutputStream(clientSocket.getOutputStream());
                         sendFile(outputStream, path);
                         break;
@@ -538,10 +544,37 @@ class ClientHandler implements Runnable {
         while ((bytesRead = fileInputStream.read(buffer)) != -1) {
             // Send the buffer contents to the client Socket
             outputStream.write(buffer, 0, bytesRead);
+            outputStream.flush();
+
         }
 
         // close the file
         fileInputStream.close();
+    }
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void ImageInfo(PrintWriter out) throws IOException {
+        String message = "Please select an image to view:\n" +
+                "1. Flamingo\n" +
+                "2. Macaw\n" +
+                "3. Robin\n" +
+                "4. Toucan\n";
+        out.println(message);
+    }
+
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private String handleResponse(BufferedReader consoleInput, int fileNumber) throws IOException {
+        return switch (fileNumber) {
+            case 1 -> IMAGE_PATH + "flamingo.jpg";
+            case 2 -> IMAGE_PATH + "macaw.jpg";
+            case 3 -> IMAGE_PATH + "robin.jpg";
+            case 4 -> IMAGE_PATH + "toucan.jpg";
+            default -> null;
+        };
     }
 
 }
