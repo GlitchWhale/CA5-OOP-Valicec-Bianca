@@ -8,12 +8,11 @@ import Server.Exceptions.DaoException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -149,6 +148,15 @@ class ClientHandler implements Runnable {
                         String jsonRequest = socketReader.readLine();
                         addEntity(jsonRequest, socketWriter);
                         break;
+                    case 12:
+                        jsonRequest = socketReader.readLine();
+                        deleteEntityById(jsonRequest, socketWriter);
+                        break;
+                    case 13:
+                        String path = socketReader.readLine();
+                        BufferedOutputStream outputStream = new BufferedOutputStream(clientSocket.getOutputStream());
+                        sendFile(outputStream, path);
+                        break;
                     case 0:
                         handleExit(socketWriter);
                         break;
@@ -161,6 +169,8 @@ class ClientHandler implements Runnable {
             }
         } catch (IOException ex) {
             System.out.println("Error reading from client: " + ex.getMessage());
+        } catch (DaoException e) {
+            throw new RuntimeException(e);
         } finally {
             try {
                 socketWriter.close();
@@ -507,5 +517,31 @@ class ClientHandler implements Runnable {
         Thread.currentThread().interrupt();
     }
 
+    /**
+     * Main Author: Bianca Valicec
+     **/
+    private void sendFile(BufferedOutputStream outputStream, String path) throws IOException {
+        // Open the File at the specified location (path)
+        File file = new File(path);
+        FileInputStream fileInputStream = new FileInputStream(file);
+
+        // send the length (in bytes) of the file to the client
+        String fileLength = Long.toString(file.length());
+        outputStream.write(fileLength.getBytes());
+        outputStream.write('\n'); // Add a newline character to separate file length from file data
+
+        // Here we break file into chunks
+        byte[] buffer = new byte[4 * 1024]; // 4 kilobyte buffer
+        int bytesRead;
+
+        // read bytes from file into the buffer until buffer is full or we reached end of file
+        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+            // Send the buffer contents to the client Socket
+            outputStream.write(buffer, 0, bytesRead);
+        }
+
+        // close the file
+        fileInputStream.close();
+    }
 
 }

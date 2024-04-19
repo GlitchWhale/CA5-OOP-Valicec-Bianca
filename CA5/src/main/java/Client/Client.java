@@ -22,6 +22,7 @@ public class Client {
     private static final String SERVER_HOST = "localhost";
 
     private static final Map<Integer, String> COMMANDS = new HashMap<>();
+
     static {
         COMMANDS.put(1, "Find All Users");
         COMMANDS.put(2, "Find User By Student ID");
@@ -33,6 +34,9 @@ public class Client {
         COMMANDS.put(8, "Convert a single user to JSON");
         COMMANDS.put(9, "Display Entity by Id");
         COMMANDS.put(10, "Display All Entities"); // Added for Feature 10
+        COMMANDS.put(11, "Add Entity"); // Added for Feature 11
+        COMMANDS.put(12, "Delete Entity by Id"); // Added for Feature 12
+        COMMANDS.put(13, "Download Image"); // Added for Feature 13
         COMMANDS.put(0, "Exit");
     }
 
@@ -81,6 +85,13 @@ public class Client {
                         break;
                     case 11:
                         addEntity(out, in, consoleInput);
+                        break;
+                    case 12:
+                        deleteEntityById(out, in, consoleInput);
+                        break;
+                    case 13:
+                        String fileName = chooseFile(consoleInput);
+                        receiveFile(new DataInputStream(socket.getInputStream()), fileName);
                         break;
                     case 0:
                         exit(out);
@@ -362,7 +373,8 @@ public class Client {
     private void displayAllEntities(BufferedReader in) throws IOException {
         String json = in.readLine();
         Gson gson = new Gson();
-        List<User> users = gson.fromJson(json, new TypeToken<List<User>>(){}.getType());
+        List<User> users = gson.fromJson(json, new TypeToken<List<User>>() {
+        }.getType());
         displayUsers(users);
     }
 
@@ -372,6 +384,75 @@ public class Client {
             System.out.println(user); // Assuming User class has a toString() method
         }
     }
+
+    private static void receiveFile(DataInputStream dataInputStream, String fileName)
+            throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+
+        long bytesRemaining = dataInputStream.readLong(); // Read file size in bytes
+        byte[] buffer = new byte[4 * 1024]; // 4 kilobyte buffer
+
+        int bytesRead;
+        while (bytesRemaining > 0 && (bytesRead = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, bytesRemaining))) != -1) {
+            fileOutputStream.write(buffer, 0, bytesRead);
+            bytesRemaining -= bytesRead;
+        }
+
+        fileOutputStream.close();
+        System.out.println("File " + fileName + " received successfully.");
+    }
+
+    private String chooseFile(BufferedReader consoleInput) throws IOException {
+        System.out.println("Choose a file to download:");
+        System.out.println("1. flamingo");
+        System.out.println("2. macaw");
+        System.out.println("3. robin");
+        System.out.println("4. toucan");
+        System.out.print("Enter the number of the file you would like to download: ");
+        String fileNumber = consoleInput.readLine();
+        return switch (fileNumber) {
+            case "1" -> "src/main/java/Images/flamingo.jpg";
+            case "2" -> "src/main/java/Images/macaw.jpg";
+            case "3" -> "src/main/java/Images/robin.jpg";
+            case "4" -> "src/main/java/Images/toucan.jpg";
+            default -> null;
+        };
+    }
+
+    private static void receiveFile(BufferedInputStream inputStream, String fileName) throws IOException {
+        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+
+        // read the size of the file in bytes (the file length)
+        StringBuilder fileLengthBuilder = new StringBuilder();
+        int nextByte;
+        while ((nextByte = inputStream.read()) != '\n') {
+            fileLengthBuilder.append((char) nextByte);
+        }
+        long fileLength = Long.parseLong(fileLengthBuilder.toString());
+        System.out.println("Client: File size in bytes = " + fileLength);
+
+        // create a buffer to receive the incoming bytes from the socket
+        byte[] buffer = new byte[4 * 1024]; // 4 kilobyte buffer
+        System.out.println("Client: Receiving file...");
+
+        int bytesRead; // number of bytes read from the socket
+        long bytesRemaining = fileLength; // bytes remaining to be read (initially equal to file size)
+
+        // next, read the raw bytes in chunks (buffer size) that make up the image file
+        while (bytesRemaining > 0 && (bytesRead = inputStream.read(buffer, 0, (int) Math.min(buffer.length, bytesRemaining))) != -1) {
+            // write the buffer data into the local file
+            fileOutputStream.write(buffer, 0, bytesRead);
+
+            // reduce the 'bytesRemaining' to be read by the number of bytes read
+            bytesRemaining -= bytesRead;
+        }
+
+        System.out.println("Client: File received successfully.");
+
+        // close the file
+        fileOutputStream.close();
+    }
+
 
     private void exit(PrintWriter out) {
         // Send a notification to the server that the client is quitting
