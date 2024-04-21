@@ -1,23 +1,25 @@
 package DAOs;
 
+import Client.Client;
 import Server.Comparators.UserGradeComparator;
 import Server.DTOs.User;
 import Server.Exceptions.DaoException;
 import Server.DAOs.MySqlUserDao;
 import Server.DAOs.UserDaoInterface;
+import Server.Server;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -35,8 +37,8 @@ public class MySqlUserDaoTest {
     private BufferedReader consoleInput;
 
     /**
-    * Main Author: Bianca Valicec
-    **/
+     * Main Author: Bianca Valicec
+     **/
     @BeforeEach
     public void setup() throws IOException {
         socket = new Socket(SERVER_HOST, SERVER_PORT);
@@ -228,5 +230,85 @@ public class MySqlUserDaoTest {
         // Expecting a response indicating that the entity was not found
         String response = in.readLine();
         assertEquals("Entity not found.", response);
+    }
+
+    /**
+     * Main Author: Liam Moore
+     * @throws IOException
+     */
+    @Test
+    public void testDisplayAllEntitys() throws IOException {
+        // Sending command for Display all Entitys
+        out.println(10);
+
+        String jsonResponseFromServer = in.readLine();
+
+        Gson gson = new Gson();
+
+        List<User> entitys = gson.fromJson(jsonResponseFromServer, new TypeToken<List<User>>(){}.getType());
+
+        assertNotNull("Entitys should not be null", entitys);
+        assertFalse("Entitys should not be empty",  entitys.isEmpty());
+    }
+
+    //Not working(getting really confused)
+
+
+    /**
+     * Main Author: Liam Moore
+     * @throws IOException
+     */
+    @Test
+    public void testIfServerSendsFile() throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        //crete test file
+        File testImage = createTestImageFile("image.jpg");
+        Server server = new Server();
+
+        //call the sendFile method which it isnt doing idk why
+        server.sendFile(new BufferedOutputStream(outputStream), testImage.getPath());
+
+        //check if the lenght of the file was sent corrdctly
+        String data = outputStream.toString();
+        assertTrue("Image lenght is not correct", data.contains(String.valueOf(testImage.length())));
+
+        //cleanup an deleting test file
+        testImage.delete();
+
+    }
+
+    /**
+     * Main Author: Liam Moore
+     * @throws IOException
+     */
+    @Test
+    public void testIfClientRecievesFile() throws IOException {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("75643/n".getBytes());
+
+        //creating a test file
+        String fileName = "image.jpg";
+
+        //Call the recieveFile method in client which it wont for some reason(same with Server)
+        Client client = new Client();
+        Client.receiveFile(new BufferedInputStream(inputStream), fileName);
+
+        //check if the data has been saved correctly
+        File receivedTheFile = new File(fileName);
+        assertTrue("does not exsist", receivedTheFile.exists());
+        assertEquals(String.valueOf(75643L),receivedTheFile.length(), "not the right size");
+
+
+        //cleanup and deleting test file
+        receivedTheFile.delete();
+
+    }
+
+    //Create temporary image file
+    private File createTestImageFile(String fileName) throws IOException{
+        File testImage = new File(fileName);
+
+        testImage.createNewFile();
+        return testImage;
     }
 }

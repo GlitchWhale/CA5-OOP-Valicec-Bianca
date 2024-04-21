@@ -424,7 +424,7 @@ public class Client {
         return fileName;
     }
 
-    private static void receiveFile(BufferedInputStream inputStream, String fileName) throws IOException {
+    public static void receiveFile(BufferedInputStream inputStream, String fileName) throws IOException {
         FileOutputStream fileOutputStream = new FileOutputStream(fileName);
 
         // read the size of the file in bytes (the file length)
